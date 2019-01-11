@@ -8,8 +8,12 @@ int main(int argc, char *argv[]) {
 
     while (msg != GAME_TERMINATE) {
         msg = game_run();
-        if (msg == GAME_TERMINATE)
-            printf("Game Over\n");
+        if (msg == GAME_TERMINATE){
+                printf("Game Over\n");
+        }else if(msg == PLAY_AGAIN){
+            game_init();
+            game_begin();
+        }
     }
 
     game_destroy();
@@ -80,6 +84,7 @@ void game_begin() {
 
 int process_event(){
     // Request the event
+    
     ALLEGRO_EVENT event;
     al_wait_for_event(event_queue, &event);
 
@@ -127,7 +132,10 @@ int process_event(){
             case ALLEGRO_KEY_ENTER:
                 judge_next_window = true;
                 break;
-            
+            case ALLEGRO_KEY_F:
+                input_file = 1;
+                break;
+
         }
     }else if(event.type == ALLEGRO_EVENT_KEY_UP){
         switch(event.keyboard.keycode)
@@ -226,7 +234,7 @@ int game_run() {
             if(judge_next_window) {
                 window = 2;
                 // Setting Character
-                // setting character1 
+                // setting character1
                 character1.x = WIDTH / 2;
                 character1.y = HEIGHT / 2 + 150;
                 character1.height = 162;
@@ -239,6 +247,12 @@ int game_run() {
                 character3.image_path = al_load_bitmap("teemo_right.png");
                 background = al_load_bitmap("stage.jpg");
                 // setting bullet
+                if(input_file){
+                    //read file
+                    //change blood
+                }else{
+                    //
+                }
                 int i;
                 for (i = 0; i < MAX_BULLET; i++) {
                     bullet[i].width = 30;
@@ -248,6 +262,7 @@ int game_run() {
                     bullet[i].vy = -3;
                     bullet[i].hidden = true;
                 }
+
                 //Initialize Timer
                 timer  = al_create_timer(1.0/15.0);
                 timer2  = al_create_timer(1.0);
@@ -276,13 +291,40 @@ int game_run() {
 
         //blood
         //player
-        
+
         if( blood_top_x <= blood_down_temp ){
             al_draw_rectangle(blood_top_x-0.5, blood_top_y-0.5, blood_down_x+1, blood_down_y+1, al_map_rgb(255, 255, 255), 1.0);
             al_draw_filled_rectangle(blood_top_x, blood_top_y, blood_down_temp, blood_down_y, al_map_rgb(255, 0, 0));
-            //blood_down_temp -= injury;
+            blood_down_temp -= injury;
         }else{
-            return GAME_TERMINATE;
+            al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+220 , ALLEGRO_ALIGN_CENTRE, "Press R to RESATRT");
+            al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+190 , ALLEGRO_ALIGN_CENTRE, "Press E to END");
+            printf("OK!\n");
+            ALLEGRO_EVENT event_r_e;
+            al_wait_for_event(event_queue, &event_r_e);
+            if(event_r_e.type == ALLEGRO_EVENT_KEY_DOWN){
+                switch(event_r_e.keyboard.keycode){
+                    case ALLEGRO_KEY_R:
+                        blood_down_temp = blood_down_x;
+                        window = 1;
+                        return PLAY_AGAIN;
+                        break;
+                    case ALLEGRO_KEY_E:
+                        return GAME_TERMINATE;
+                        break;
+                    case ALLEGRO_KEY_ESCAPE:
+                        return GAME_TERMINATE;
+                        break;
+                    default:
+                        al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
+                        al_flip_display();
+                        al_rest(1.0);
+                        return GAME_TERMINATE;
+                        break;
+                }
+            }
+            
+            //return GAME_TERMINATE;
         }
         //enermy
         al_draw_rectangle(blood_top_x + blood_between_distance-0.5, blood_top_y-0.5, blood_down_x + blood_between_distance+1, blood_down_y+1, al_map_rgb(255, 255, 255), 1.0);

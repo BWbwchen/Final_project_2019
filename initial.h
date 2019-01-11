@@ -10,6 +10,7 @@
 #include <allegro5/allegro_ttf.h>
 
 #define GAME_TERMINATE -1
+#define PLAY_AGAIN 666
 #define Keynumber 10
 #define Velocity 30
 #define MAX_BULLET 20
@@ -87,7 +88,7 @@ bool next = false; //true: trigger
 bool dir = true; //true: left, false: right
 bool keys[Keynumber];
 bool is_injury = true;
-
+bool input_file = false;
 
 void show_err_msg(int msg);
 void game_init();
