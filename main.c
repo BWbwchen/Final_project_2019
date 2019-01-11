@@ -128,13 +128,17 @@ int process_event(){
                 break;
             case ALLEGRO_KEY_ESCAPE:
                 return GAME_TERMINATE;
+            case ALLEGRO_KEY_F:
+                input_file = 1;
+                break;
+            case ALLEGRO_KEY_B:
+                store = true;
+                break;
             // For Start Menu
             case ALLEGRO_KEY_ENTER:
                 judge_next_window = true;
                 break;
-            case ALLEGRO_KEY_F:
-                input_file = 1;
-                break;
+            
 
         }
     }else if(event.type == ALLEGRO_EVENT_KEY_UP){
@@ -281,7 +285,7 @@ int game_run() {
         }
     }
     // Second window(Main Game)
-    else if(window == 2){
+    else if(window == 2 && !store){
         // Change Image for animation
         al_draw_bitmap(background, 0,0, 0);
         if(ture) al_draw_bitmap(character1.image_path, character1.x, character1.y, 0);
@@ -297,33 +301,7 @@ int game_run() {
             al_draw_filled_rectangle(blood_top_x, blood_top_y, blood_down_temp, blood_down_y, al_map_rgb(255, 0, 0));
             blood_down_temp -= injury;
         }else{
-            al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+220 , ALLEGRO_ALIGN_CENTRE, "Press R to RESATRT");
-            al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+190 , ALLEGRO_ALIGN_CENTRE, "Press E to END");
-            printf("OK!\n");
-            ALLEGRO_EVENT event_r_e;
-            al_wait_for_event(event_queue, &event_r_e);
-            if(event_r_e.type == ALLEGRO_EVENT_KEY_DOWN){
-                switch(event_r_e.keyboard.keycode){
-                    case ALLEGRO_KEY_R:
-                        blood_down_temp = blood_down_x;
-                        window = 1;
-                        return PLAY_AGAIN;
-                        break;
-                    case ALLEGRO_KEY_E:
-                        return GAME_TERMINATE;
-                        break;
-                    case ALLEGRO_KEY_ESCAPE:
-                        return GAME_TERMINATE;
-                        break;
-                    default:
-                        al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
-                        al_flip_display();
-                        al_rest(1.0);
-                        return GAME_TERMINATE;
-                        break;
-                }
-            }
-            
+            window = 3;
             //return GAME_TERMINATE;
         }
         //enermy
@@ -347,6 +325,38 @@ int game_run() {
         if (!al_is_event_queue_empty(event_queue)) {
             error = process_event();
         }
+    }else if(window == 2 && store){
+        window = 4;
+    }else if(window == 3){
+        al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+220 , ALLEGRO_ALIGN_CENTRE, "Press R to RESATRT");
+        al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+190 , ALLEGRO_ALIGN_CENTRE, "Press E to END");
+        printf("OK!\n");
+        ALLEGRO_EVENT event_r_e;
+        al_wait_for_event(event_queue, &event_r_e);
+        if(event_r_e.type == ALLEGRO_EVENT_KEY_DOWN){
+            switch(event_r_e.keyboard.keycode){
+                case ALLEGRO_KEY_R:
+                    blood_down_temp = blood_down_x;
+                    window = 1;
+                    return PLAY_AGAIN;
+                    break;
+                case ALLEGRO_KEY_E:
+                    return GAME_TERMINATE;
+                    break;
+                case ALLEGRO_KEY_ESCAPE:
+                    return GAME_TERMINATE;
+                    break;
+                default:
+                    al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
+                    al_flip_display();
+                    al_rest(1.0);
+                    return GAME_TERMINATE;
+                    break;
+            }
+        }
+        al_flip_display();
+    }else if(window == 4){
+        //store
     }
     return error;
 }

@@ -89,6 +89,7 @@ bool dir = true; //true: left, false: right
 bool keys[Keynumber];
 bool is_injury = true;
 bool input_file = false;
+bool store = false;
 
 void show_err_msg(int msg);
 void game_init();
