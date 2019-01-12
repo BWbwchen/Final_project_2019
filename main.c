@@ -60,6 +60,7 @@ void game_init() {
     al_register_event_source(event_queue, al_get_keyboard_event_source());
 
     memset (keys, false, Keynumber * sizeof(bool ));
+    srand(time(NULL));
 
 
 }
@@ -193,10 +194,15 @@ int process_event(){
     for (i = 0; i < MAX_BULLET; i++) {
         if (bullet[i].hidden)
             continue;
+        reflection(bullet[i].x, bullet[i].y, bullet[i].height, bullet[i].width, i);
         bullet[i].x += bullet[i].vx;
         bullet[i].y += bullet[i].vy;
-        if (bullet[i].y  <=  0)
+        if (bullet[i].y  <=  0){
             bullet[i].hidden = true;
+            bullet[i].vx = rand()%7 -3 + (!(rand()%7 -3))*1;
+            bullet[i].vy = rand()%7 -3 + (!(rand()%7 -3))*1;
+        }
+            
     }
      // [HACKATHON 2-7
     // TODO: Shoot if key is down and cool-down is over.
@@ -222,7 +228,7 @@ int process_event(){
         last_shoot_timestamp = now;
         bullet[i].hidden = false;
         bullet[i].x = character1.x;
-        bullet[i].y = character1.y - bullet[i].height;
+        bullet[i].y = character1.y;
     }
 
 
@@ -241,15 +247,17 @@ int game_run() {
                 // setting character1
                 character1.x = WIDTH / 2;
                 character1.y = HEIGHT / 2 + 150;
-                character1.height = 162;
-                character1.width = 100;
+                character1.height = 30;
+                character1.width = 30;
                 // setting character2
                 character2.x = WIDTH + 100;
                 character2.y = HEIGHT / 2 - 280;
-                character1.image_path = al_load_bitmap("tower.png");
+                character1.image_path =load_bitmap_at_size("main_character.png",character1.height,character1.width);
+
                 character2.image_path = al_load_bitmap("teemo_left.png");
                 character3.image_path = al_load_bitmap("teemo_right.png");
                 background = al_load_bitmap("stage.jpg");
+                printf("ok!\n");
                 // setting bullet
                 if(input_file){
                     //read file
@@ -257,16 +265,8 @@ int game_run() {
                 }else{
                     //
                 }
-                int i;
-                for (i = 0; i < MAX_BULLET; i++) {
-                    bullet[i].width = 30;
-                    bullet[i].height = 60;
-                    bullet[i].image_path = load_bitmap_at_size("bullet.png",bullet[i].width,bullet[i].height);
-                    bullet[i].vx = 0;
-                    bullet[i].vy = -3;
-                    bullet[i].hidden = true;
-                }
 
+                load_bullet();
                 //Initialize Timer
                 timer  = al_create_timer(1.0/15.0);
                 timer2  = al_create_timer(1.0);
@@ -299,7 +299,7 @@ int game_run() {
         if( blood_top_x <= blood_down_temp ){
             al_draw_rectangle(blood_top_x-0.5, blood_top_y-0.5, blood_down_x+1, blood_down_y+1, al_map_rgb(255, 255, 255), 1.0);
             al_draw_filled_rectangle(blood_top_x, blood_top_y, blood_down_temp, blood_down_y, al_map_rgb(255, 0, 0));
-            blood_down_temp -= injury;
+            //blood_down_temp -= injury;
         }else{
             window = 3;
             //return GAME_TERMINATE;
@@ -331,6 +331,8 @@ int game_run() {
         al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+220 , ALLEGRO_ALIGN_CENTRE, "Press R to RESATRT");
         al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+190 , ALLEGRO_ALIGN_CENTRE, "Press E to END");
         printf("OK!\n");
+
+        al_flip_display();
         ALLEGRO_EVENT event_r_e;
         al_wait_for_event(event_queue, &event_r_e);
         if(event_r_e.type == ALLEGRO_EVENT_KEY_DOWN){
@@ -347,6 +349,7 @@ int game_run() {
                     return GAME_TERMINATE;
                     break;
                 default:
+                    al_clear_to_color(al_map_rgb(0,0,0));
                     al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
                     al_flip_display();
                     al_rest(1.0);
@@ -354,7 +357,6 @@ int game_run() {
                     break;
             }
         }
-        al_flip_display();
     }else if(window == 4){
         //store
     }
@@ -370,8 +372,7 @@ void game_destroy() {
     al_destroy_bitmap(image);
     al_destroy_sample(song);
 }
-ALLEGRO_BITMAP *load_bitmap_at_size(const char *filename, int w, int h)
-{
+ALLEGRO_BITMAP *load_bitmap_at_size(const char *filename, int w, int h){
   ALLEGRO_BITMAP *resized_bmp, *loaded_bmp, *prev_target;
 
   // 1. create a temporary bitmap of size we want
@@ -405,4 +406,77 @@ ALLEGRO_BITMAP *load_bitmap_at_size(const char *filename, int w, int h)
   al_destroy_bitmap(loaded_bmp);
 
   return resized_bmp;
+}
+
+void load_bullet(){
+    int i;
+    for (i = 0; i < MAX_BULLET; i++) {
+        bullet[i].width = 30;
+        bullet[i].height = 30;
+        switch(i){
+            case 0:
+                bullet[i].image_path = load_bitmap_at_size("ball_1.png",bullet[i].width,bullet[i].height);
+                break;
+            case 1:
+                bullet[i].image_path = load_bitmap_at_size("ball_2.png",bullet[i].width,bullet[i].height);
+                break;
+            case 2:
+                bullet[i].image_path = load_bitmap_at_size("ball_3.png",bullet[i].width,bullet[i].height);
+                break;
+            case 3:
+                bullet[i].image_path = load_bitmap_at_size("ball_4.png",bullet[i].width,bullet[i].height);
+                break;
+            case 4:
+                bullet[i].image_path = load_bitmap_at_size("ball_5.png",bullet[i].width,bullet[i].height);
+                break;
+            case 5:
+                bullet[i].image_path = load_bitmap_at_size("ball_6.png",bullet[i].width,bullet[i].height);
+                break;
+            case 6:
+                bullet[i].image_path = load_bitmap_at_size("ball_7.png",bullet[i].width,bullet[i].height);
+                break;
+            case 7:
+                bullet[i].image_path = load_bitmap_at_size("ball_8.png",bullet[i].width,bullet[i].height);
+                break;
+            case 8:
+                bullet[i].image_path = load_bitmap_at_size("ball_9.png",bullet[i].width,bullet[i].height);
+                break;
+            case 9:
+                bullet[i].image_path = load_bitmap_at_size("ball_10.png",bullet[i].width,bullet[i].height);
+                break;
+            case 10:
+                bullet[i].image_path = load_bitmap_at_size("ball_11.png",bullet[i].width,bullet[i].height);
+                break;
+            case 11:
+                bullet[i].image_path = load_bitmap_at_size("ball_12.png",bullet[i].width,bullet[i].height);
+                break;
+            case 12:
+                bullet[i].image_path = load_bitmap_at_size("ball_13.png",bullet[i].width,bullet[i].height);
+                break;
+            case 13:
+                bullet[i].image_path = load_bitmap_at_size("ball_14.png",bullet[i].width,bullet[i].height);
+                break;
+            case 14:
+                bullet[i].image_path = load_bitmap_at_size("ball_15.png",bullet[i].width,bullet[i].height);
+                break;
+            case 15:
+                bullet[i].image_path = load_bitmap_at_size("ball_white.png",bullet[i].width,bullet[i].height);
+                break;
+        }
+        bullet[i].vx = rand()%7 -3 + (!(rand()%7 -3))*1;
+        bullet[i].vy = rand()%7 -3 + (!(rand()%7 -3))*1;
+        bullet[i].hidden = true;
+    }
+}
+void reflection(int x, int y, int height, int width, int index){
+    if(x <= 0){
+        //increase 1~3 times speed
+        bullet[index].vx = -bullet[index].vx;
+    }else if(y <= 0){
+        bullet[index].vy = -bullet[index].vy;
+    }else if(x + width >= WIDTH){
+        bullet[index].vx = -bullet[index].vx;
+    }else if(y + height >= HEIGHT){
+        bullet[index].vy = -bullet[index].vy;
+    }
 }

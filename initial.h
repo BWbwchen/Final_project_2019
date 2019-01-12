@@ -13,7 +13,7 @@
 #define PLAY_AGAIN 666
 #define Keynumber 10
 #define Velocity 30
-#define MAX_BULLET 20
+#define MAX_BULLET 16
 #define UP 0
 #define DOWN 1
 #define LEFT 2
@@ -40,14 +40,14 @@ const char *title = "Final Project 107062115";
 const float FPS = 60;
 const int WIDTH = 400;
 const int HEIGHT = 600;
-const float MAX_COOLDOWN = 0.005;
+const float MAX_COOLDOWN = 0.5;
 //draw blood
-float blood_top_x = 5.0; 
+float blood_top_x = 5.0;
 float blood_top_y = 10.0;
 float blood_height = 10.0;
 float blood_width = 100.0;
 float blood_between_distance = 290.0;
-float injury = 1.0;
+float injury = 0.01;
 float blood_down_x;
 float blood_down_y;
 float blood_down_temp;
@@ -98,6 +98,8 @@ int process_event();
 int game_run();
 void game_destroy();
 ALLEGRO_BITMAP *load_bitmap_at_size(const char * , int , int );
+void load_bullet();
+void reflection(int ,int ,int ,int ,int );
 
 
 void show_err_msg(int msg) {
