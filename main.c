@@ -91,7 +91,7 @@ int process_event(){
 
     // Our setting for controlling animation
     if(event.timer.source == timer){
-        if(character2.x < -150) dir = false;
+        if(character2.x < -150) dir = false;//character3
         else if(character2.x > WIDTH+50) dir = true;
 
         if(dir) character2.x -= 10;
@@ -175,6 +175,7 @@ int process_event(){
     character1.x -= keys[LEFT] * Velocity;
     character1.x += keys[RIGHT] * Velocity;
 
+    //border limit
     if (character1.x <= 0)
         character1.x = 0;
     else if (character1.x + character1.width >= WIDTH)
@@ -184,39 +185,19 @@ int process_event(){
     else if (character1.y + character1.height >= HEIGHT)
         character1.y = HEIGHT - character1.height;
 
-    // [HACKATHON 2-6]
-    // TODO: Update bullet coordinates.
-    // 1) For each bullets, if it's not hidden, update x, y
-    // according to vx, vy.
-    // 2) If the bullet is out of the screen, hide it.
-    // Uncomment and fill in the code below.
+    //player's bullet
     int i;
     for (i = 0; i < MAX_BULLET; i++) {
         if (bullet[i].hidden)
             continue;
-        reflection(bullet[i].x, bullet[i].y, bullet[i].height, bullet[i].width, i);
+        //reflection(bullet[i].x, bullet[i].y, bullet[i].height, bullet[i].width, i);
         bullet[i].x += bullet[i].vx;
         bullet[i].y += bullet[i].vy;
         if (bullet[i].y  <=  0){
             bullet[i].hidden = true;
-            bullet[i].vx = rand()%7 -3 + (!(rand()%7 -3))*1;
-            bullet[i].vy = rand()%7 -3 + (!(rand()%7 -3))*1;
         }
             
     }
-     // [HACKATHON 2-7
-    // TODO: Shoot if key is down and cool-down is over.
-    // 1) Get the time now using 'al_get_time'.
-    // 2) If Space key is down in 'key_state' and the time
-    //    between now and last shoot is not less that cool
-    //    down time.
-    // 3) Loop through the bullet array and find one that is hidden.
-    //    (This part can be optimized.)
-    // 4) The bullet will be found if your array is large enough.
-    // 5) Set the last shoot time to now.
-    // 6) Set hidden to false (recycle the bullet) and set its x, y to the
-    //    front part of your plane.
-    // Uncomment and fill in the code below.
     double now = al_get_time();
     if (keys[SPACE] && now - last_shoot_timestamp >= MAX_COOLDOWN) {
         for (i = 0; i < MAX_BULLET; i++) {
@@ -230,6 +211,63 @@ int process_event(){
         bullet[i].x = character1.x;
         bullet[i].y = character1.y;
     }
+
+    //enermy's bullet
+    for (i = 0; i < MAX_ENEMY_BULLET; i++) {
+        if (enemy_bullet[i].hidden)
+            continue;
+        reflection(enemy_bullet[i].x, enemy_bullet[i].y, enemy_bullet[i].height, enemy_bullet[i].width, i);
+        enemy_bullet[i].x += enemy_bullet[i].vx;
+        enemy_bullet[i].y += enemy_bullet[i].vy;
+        if (enemy_bullet[i].y  <=  0){
+            enemy_bullet[i].hidden = true;
+            enemy_bullet[i].vx = rand()%7 - 3;
+            enemy_bullet[i].vy = 8;
+        }
+            
+    }
+    double enemy_now = al_get_time();
+
+    if (enemy_now - last_shoot_timestamp_ENEMY >= MAX_ENEMY_COOLDOWN) {
+        for (i = 0; i < MAX_ENEMY_BULLET; i++) {
+            if (enemy_bullet[i].hidden)
+                break;
+        }
+        if (i == MAX_ENEMY_BULLET)
+            return 0;
+        last_shoot_timestamp_ENEMY = enemy_now;
+        enemy_bullet[i].hidden = false;
+        if(dir){
+            enemy_bullet[i].x = character2.x;
+            enemy_bullet[i].y = character2.y;
+        }else{
+            enemy_bullet[i].x = character2.x;
+            enemy_bullet[i].y = character2.y;
+        }
+    }
+
+    //player injury
+    for(i = 0; i < MAX_ENEMY_BULLET; i++){
+        if((!enemy_bullet[i].hidden) && (enemy_bullet[i].y+enemy_bullet[i].height >= character1.y)&&
+        (enemy_bullet[i].y+enemy_bullet[i].height <= character1.y+character1.height)&&
+        (enemy_bullet[i].x >= character1.x)&&
+        (enemy_bullet[i].x+enemy_bullet[i].width <= character1.x+character1.width) ){
+            enemy_bullet[i].hidden = true;
+            injury = 2.0;
+        }
+    }
+    //enemy injury
+    for(i = 0; i < MAX_BULLET; i++){        
+        if((!bullet[i].hidden) && (bullet[i].x > character2.x)&&
+        (bullet[i].x < character2.x+character2.width)&&
+        (bullet[i].y > character2.y)&&
+        (bullet[i].y < character2.y+character2.height) ){
+            printf("hit!\n");
+            bullet[i].hidden = true;
+            injury_enemy = 2.0;
+        }
+    }
+
 
 
     return 0;
@@ -247,17 +285,21 @@ int game_run() {
                 // setting character1
                 character1.x = WIDTH / 2;
                 character1.y = HEIGHT / 2 + 150;
-                character1.height = 30;
-                character1.width = 30;
+                character1.height = 50;
+                character1.width = 50;
                 // setting character2
                 character2.x = WIDTH + 100;
                 character2.y = HEIGHT / 2 - 280;
+                character2.width = 100;
+                character2.height = 96;
+                //character3.x = -100;
+                //character3.y = HEIGHT / 2 - 280;
+                
                 character1.image_path =load_bitmap_at_size("main_character.png",character1.height,character1.width);
-
                 character2.image_path = al_load_bitmap("teemo_left.png");
                 character3.image_path = al_load_bitmap("teemo_right.png");
                 background = al_load_bitmap("stage.jpg");
-                printf("ok!\n");
+
                 // setting bullet
                 if(input_file){
                     //read file
@@ -265,7 +307,16 @@ int game_run() {
                 }else{
                     //
                 }
-
+                //load enemy's bullet
+                int i;
+                for(i = 0; i < MAX_ENEMY_BULLET; i++){
+                    enemy_bullet[i].width = 30;
+                    enemy_bullet[i].height = 30;
+                    enemy_bullet[i].image_path = load_bitmap_at_size("enemy_bullet.png",enemy_bullet[i].width,enemy_bullet[i].height);
+                    enemy_bullet[i].vx = rand()%7 - 3;
+                    enemy_bullet[i].vy = 8;
+                }
+                //load player's bullet
                 load_bullet();
                 //Initialize Timer
                 timer  = al_create_timer(1.0/15.0);
@@ -281,6 +332,7 @@ int game_run() {
                 blood_down_x = blood_top_x + blood_width;
                 blood_down_y = blood_top_y + blood_height;
                 blood_down_temp = blood_down_x;
+                blood_down_enemy = blood_down_x + blood_between_distance;
             }
         }
     }
@@ -297,26 +349,44 @@ int game_run() {
         //player
 
         if( blood_top_x <= blood_down_temp ){
+            blood_down_temp -= injury;
             al_draw_rectangle(blood_top_x-0.5, blood_top_y-0.5, blood_down_x+1, blood_down_y+1, al_map_rgb(255, 255, 255), 1.0);
             al_draw_filled_rectangle(blood_top_x, blood_top_y, blood_down_temp, blood_down_y, al_map_rgb(255, 0, 0));
-            //blood_down_temp -= injury;
+            
+            printf("%f\n",blood_down_temp);
+            injury = 0;
         }else{
             window = 3;
             //return GAME_TERMINATE;
         }
         //enermy
-        al_draw_rectangle(blood_top_x + blood_between_distance-0.5, blood_top_y-0.5, blood_down_x + blood_between_distance+1, blood_down_y+1, al_map_rgb(255, 255, 255), 1.0);
-        al_draw_filled_rectangle(blood_top_x + blood_between_distance,
-         blood_top_y ,
-         blood_down_x + blood_between_distance,
-         blood_down_y,
-         al_map_rgb(255, 0, 0));
 
-        //bullet
+        if( blood_top_x + blood_between_distance <= blood_down_enemy ){
+            blood_down_enemy -= injury_enemy;
+            al_draw_rectangle(blood_top_x + blood_between_distance-0.5, blood_top_y-0.5, blood_down_x + blood_between_distance+1, blood_down_y+1, al_map_rgb(255, 255, 255), 1.0);
+            al_draw_filled_rectangle(blood_top_x + blood_between_distance,
+                blood_top_y ,
+                blood_down_enemy,
+                blood_down_y,
+                al_map_rgb(255, 0, 0));
+            
+            injury_enemy = 0;
+        }else{
+            //win
+            window = 4;
+        }
+        
+
+        //draw player's bullet
         int i;
         for(i = 0; i < MAX_BULLET; i++){
             if(!bullet[i].hidden) al_draw_bitmap(bullet[i].image_path, bullet[i].x, bullet[i].y, 0);
         }
+        //draw enemy's bullet
+        for(i = 0; i < MAX_ENEMY_BULLET; i++){
+            if(!enemy_bullet[i].hidden) al_draw_bitmap(enemy_bullet[i].image_path, enemy_bullet[i].x, enemy_bullet[i].y, 0);
+        }
+
 
         al_flip_display();
         al_clear_to_color(al_map_rgb(0,0,0));
@@ -463,20 +533,24 @@ void load_bullet(){
                 bullet[i].image_path = load_bitmap_at_size("ball_white.png",bullet[i].width,bullet[i].height);
                 break;
         }
-        bullet[i].vx = rand()%7 -3 + (!(rand()%7 -3))*1;
-        bullet[i].vy = rand()%7 -3 + (!(rand()%7 -3))*1;
+        bullet[i].vx = 0;
+        bullet[i].vy = -7;
         bullet[i].hidden = true;
     }
 }
 void reflection(int x, int y, int height, int width, int index){
-    if(x <= 0){
+    if(x < 0){
         //increase 1~3 times speed
-        bullet[index].vx = -bullet[index].vx;
-    }else if(y <= 0){
-        bullet[index].vy = -bullet[index].vy;
+        enemy_bullet[index].x = 0;
+        enemy_bullet[index].vx = -enemy_bullet[index].vx;
+    }else if(y < 0){
+        enemy_bullet[index].y = 0;
+        enemy_bullet[index].vy = -enemy_bullet[index].vy;
     }else if(x + width >= WIDTH){
-        bullet[index].vx = -bullet[index].vx;
+        enemy_bullet[index].x = WIDTH - width;
+        enemy_bullet[index].vx = -enemy_bullet[index].vx;
     }else if(y + height >= HEIGHT){
-        bullet[index].vy = -bullet[index].vy;
+        enemy_bullet[index].y = HEIGHT - height;
+        enemy_bullet[index].vy = -enemy_bullet[index].vy;
     }
 }

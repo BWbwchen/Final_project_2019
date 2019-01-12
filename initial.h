@@ -12,8 +12,9 @@
 #define GAME_TERMINATE -1
 #define PLAY_AGAIN 666
 #define Keynumber 10
-#define Velocity 30
-#define MAX_BULLET 16
+#define Velocity 3
+#define MAX_BULLET 10
+#define MAX_ENEMY_BULLET 10
 #define UP 0
 #define DOWN 1
 #define LEFT 2
@@ -40,21 +41,26 @@ const char *title = "Final Project 107062115";
 const float FPS = 60;
 const int WIDTH = 400;
 const int HEIGHT = 600;
-const float MAX_COOLDOWN = 0.5;
+const float MAX_COOLDOWN = 0.2;
+const float MAX_ENEMY_COOLDOWN = 1.0;
 //draw blood
 float blood_top_x = 5.0;
 float blood_top_y = 10.0;
 float blood_height = 10.0;
 float blood_width = 100.0;
 float blood_between_distance = 290.0;
-float injury = 0.01;
+float injury = 0;
 float blood_down_x;
 float blood_down_y;
 float blood_down_temp;
+float blood_down_enemy;
+float injury_enemy = 0;
 
 
 
 double last_shoot_timestamp;
+double last_shoot_timestamp_ENEMY;
+
 
 
 typedef struct character
@@ -74,6 +80,7 @@ Character character1;//player
 Character character2;//anermy
 Character character3;//anermy
 Character bullet[MAX_BULLET];
+Character enemy_bullet[MAX_BULLET];
 
 int imageWidth = 0;
 int imageHeight = 0;
