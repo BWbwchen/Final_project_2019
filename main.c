@@ -267,7 +267,7 @@ int process_event(){
             if(king){
                 injury = 0;
             }else{
-                injury = 2.0 - (half_injury)*1.0;
+                injury = 5.0 - (half_injury)*2.0;
             }   
         }
     }
@@ -458,7 +458,7 @@ int game_run() {
                     al_clear_to_color(al_map_rgb(0,0,0));
                     al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
                     al_flip_display();
-                    al_rest(1.0);
+                    al_rest(2.0);
                     return GAME_TERMINATE;
                     break;
             }
@@ -481,25 +481,29 @@ int game_run() {
                         al_clear_to_color(al_map_rgb(0,0,0));
                         al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "rate of shot increase !");
                         al_flip_display();
-                        al_rest(1.0);
+                        al_rest(2.0);
                     }else{
                         al_clear_to_color(al_map_rgb(0,0,0));
                         al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "Are you idiot ?");
                         al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+195 , ALLEGRO_ALIGN_CENTRE, "not enough money !");
                         al_flip_display();
-                        al_rest(1.0);
+                        al_rest(2.0);
                     }
                     break;
                 case ALLEGRO_KEY_2:
                     if(score - 50 >= 0){//half the injury
                         score -= 50;
                         half_injury = true;
+                        al_clear_to_color(al_map_rgb(0,0,0));
+                        al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "injury is half !");
+                        al_flip_display();
+                        al_rest(2.0);
                     }else{
                         al_clear_to_color(al_map_rgb(0,0,0));
                         al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "Are you idiot ?");
                         al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+195 , ALLEGRO_ALIGN_CENTRE, "not enough money !");
                         al_flip_display();
-                        al_rest(1.0);
+                        al_rest(2.0);
                     }
                     break;
                 case ALLEGRO_KEY_TAB:
@@ -516,7 +520,7 @@ int game_run() {
                     al_clear_to_color(al_map_rgb(0,0,0));
                     al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "Are you idiot ?");
                     al_flip_display();
-                    al_rest(1.0);
+                    al_rest(2.0);
                     break;
             }
         }
@@ -572,6 +576,7 @@ int game_run() {
                     break;
                 case ALLEGRO_KEY_I://input file
                     input_file = true;
+                    out_file = true;
                     input();
                     al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+195 , ALLEGRO_ALIGN_CENTRE, "input ok!");
                     al_flip_display();
@@ -590,9 +595,9 @@ int game_run() {
                     break;
                 default:
                     al_clear_to_color(al_map_rgb(0,0,0));
-                    al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
+                    al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "Are you idiot ?");
                     al_flip_display();
-                    al_rest(1.0);
+                    al_rest(2.0);
                     break;
             }
         }

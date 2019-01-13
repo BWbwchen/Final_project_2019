@@ -13,8 +13,8 @@
 #define GAME_TERMINATE -1
 #define PLAY_AGAIN 666
 #define Keynumber 10
-#define Velocity 3
-#define MAX_BULLET 10
+#define Velocity 5
+#define MAX_BULLET 8
 #define MAX_ENEMY_BULLET 6
 #define UP 0
 #define DOWN 1
@@ -46,10 +46,11 @@ const char *title = "Final Project 107062115";
 const float FPS = 60;
 const int WIDTH = 400;
 const int HEIGHT = 600;
-const float MAX_ENEMY_COOLDOWN = 1.0;
+
 
 //draw blood
-float MAX_COOLDOWN = 0.2;
+float MAX_ENEMY_COOLDOWN = 0.5;
+float MAX_COOLDOWN = 0.5;
 float blood_top_x = 5.0;
 float blood_top_y = 10.0;
 float blood_height = 10.0;
