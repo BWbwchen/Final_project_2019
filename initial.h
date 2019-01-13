@@ -22,7 +22,6 @@
 #define RIGHT 3
 #define SPACE 4
 
-
 // ALLEGRO Variables
 ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
@@ -48,6 +47,7 @@ const float FPS = 60;
 const int WIDTH = 400;
 const int HEIGHT = 600;
 const float MAX_ENEMY_COOLDOWN = 1.0;
+
 //draw blood
 float MAX_COOLDOWN = 0.2;
 float blood_top_x = 5.0;
@@ -62,13 +62,9 @@ float blood_down_temp;
 float blood_down_enemy;
 float injury_enemy = 0;
 
-
-
-
+//double
 double last_shoot_timestamp;
 double last_shoot_timestamp_ENEMY;
-
-
 
 typedef struct character
 {
