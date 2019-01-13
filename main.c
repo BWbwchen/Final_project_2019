@@ -3,7 +3,6 @@
 int main(int argc, char *argv[]) {
     #ifdef IWANT
     freopen ("file.in", "r", stdin);
-    freopen ("file.in", "w", stdout);
     #endif
     int msg = 0;
 
@@ -21,6 +20,9 @@ int main(int argc, char *argv[]) {
             game_begin();
         }
     }
+    #ifdef IWANT
+    freopen ("file.in", "w", stdout);
+    #endif
     if(out_file) output();
     game_destroy();
     return 0;
@@ -68,8 +70,6 @@ void game_init() {
 
     memset (keys, false, Keynumber * sizeof(bool ));
     srand(time(NULL));
-
-
 }
 
 void game_begin() {
@@ -300,6 +300,20 @@ int process_event(){
         }
     }
 
+    //if my bullet hit other's bullet
+    for (i = 0; i < MAX_BULLET; ++i){
+        int j;
+        for (j = 0; j < MAX_ENEMY_BULLET; ++j){
+            if((!bullet[i].hidden) && (!enemy_bullet[j].hidden) && (bullet[i].x > enemy_bullet[j].x) &&
+                (bullet[i].x < enemy_bullet[j].x + enemy_bullet[j].width) &&
+                (bullet[i].y > enemy_bullet[j].y)&&
+                (bullet[i].y < enemy_bullet[j].y + enemy_bullet[j].height)){
+                enemy_bullet[j].hidden = true;
+                bullet[i].hidden = true;
+            }
+        }
+    }
+
 
 
     return 0;
@@ -345,9 +359,9 @@ int game_run() {
                 //load player's bullet
                 load_bullet();
                 //Initialize Timer
-                timer  = al_create_timer(1.0/15.0);
+                timer  = al_create_timer(1.0/20.0);
                 timer2  = al_create_timer(1.0);
-                timer3  = al_create_timer(1.0/10.0);
+                timer3  = al_create_timer(1.0/20.0);
                 al_register_event_source(event_queue, al_get_timer_event_source(timer)) ;
                 al_register_event_source(event_queue, al_get_timer_event_source(timer2)) ;
                 al_register_event_source(event_queue, al_get_timer_event_source(timer3)) ;
@@ -463,7 +477,7 @@ int game_run() {
         }
     }else if(window == 4){
         //store
-        //printf("in store\n");
+        //printf("%d\n",score);
         store_graph = al_load_bitmap( "store.jpg" );
         al_draw_bitmap(store_graph, 0, 0, 0);
         al_draw_textf(font, al_map_rgb(255, 255, 0), WIDTH/2, 80, ALLEGRO_ALIGN_CENTRE, "score :%d", score);
@@ -523,6 +537,7 @@ int game_run() {
         //win 
         win_graph = al_load_bitmap( "win.jpg" );
         al_draw_bitmap(win_graph, 0, 0, 0);
+        al_draw_textf(font,al_map_rgb(255, 255, 255), WIDTH/2-20, HEIGHT-150, ALLEGRO_ALIGN_CENTRE, "Press R to next");
         al_flip_display();
         ALLEGRO_EVENT event_r_e;
         al_wait_for_event(event_queue, &event_r_e);
@@ -568,15 +583,22 @@ int game_run() {
                     break;
                 case ALLEGRO_KEY_I:
                     input();
+                    al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+195 , ALLEGRO_ALIGN_CENTRE, "input ok!");
+                    al_flip_display();
+                    al_rest(1.0);
                     break;
                 case ALLEGRO_KEY_S:
                     out_file = true;
+                    al_draw_textf(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+195 , ALLEGRO_ALIGN_CENTRE, "save result !");
+                    al_flip_display();
+                    al_rest(1.0);
                     break;
                 case ALLEGRO_KEY_BACKSPACE:
                     window = 1;
                     al_draw_bitmap(start_menu, 0, 0, 0);
                     al_flip_display();
                     break;
+                
                 default:
                     al_clear_to_color(al_map_rgb(0,0,0));
                     al_draw_text(font, al_map_rgb(255,255,255), WIDTH/2, HEIGHT/2+180 , ALLEGRO_ALIGN_CENTRE, "fuck you !");
@@ -736,7 +758,7 @@ void output(){
     printf("%f\n", blood_down_temp);
     printf("%f\n", blood_down_enemy);
     printf("%f\n", injury_enemy);
-    printf("%d\n",score);
+    printf("%d\n", score);
 }
 void initial_enemy_bullet(){
     int i;
