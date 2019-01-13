@@ -15,7 +15,7 @@
 #define Keynumber 10
 #define Velocity 3
 #define MAX_BULLET 10
-#define MAX_ENEMY_BULLET 10
+#define MAX_ENEMY_BULLET 6
 #define UP 0
 #define DOWN 1
 #define LEFT 2
@@ -109,6 +109,7 @@ bool store = false;
 bool touch_enemy = false;
 bool half_injury = false;
 bool king = false;
+bool action = false;
 
 void show_err_msg(int msg);
 void game_init();
@@ -122,6 +123,7 @@ void reflection(int ,int ,int ,int ,int );
 void play_music();
 void input();
 void output();
+void initial_enemy_bullet();
 
 
 void show_err_msg(int msg) {
